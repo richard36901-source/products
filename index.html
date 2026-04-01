@@ -1,0 +1,723 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#060d1a">
+<title>AutoScale — רכישה מהירה</title>
+<link rel="icon" type="image/png" href="https://raw.githubusercontent.com/richard36901-source/Home-page/main/logo.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #060d1a;
+    --glass: rgba(12,26,56,0.55);
+    --glass2: rgba(8,18,40,0.70);
+    --border: rgba(80,140,255,0.13);
+    --border-soft: rgba(80,140,255,0.08);
+    --border-accent: rgba(58,142,246,0.35);
+    --text: #e8f0ff;
+    --muted: #6a85b6;
+    --muted2: #4a6090;
+    --accent: #3a8ef6;
+    --accent2: #1dffd4;
+    --green: #25D366;
+    --warn: #ffb347;
+    --radius: 18px;
+    --radius-sm: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Sora', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80vw 55vh at 10% -5%, rgba(30,90,220,0.22) 0%, transparent 65%),
+      radial-gradient(ellipse 60vw 40vh at 90% 10%, rgba(0,200,180,0.10) 0%, transparent 60%),
+      radial-gradient(ellipse 100vw 30vh at 50% 100%, rgba(10,30,80,0.5) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(58,142,246,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(58,142,246,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 28px 20px 80px;
+  }
+
+  /* ── HEADER ── */
+  header {
+    margin-bottom: 36px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .logo-mark {
+    width: 48px; height: 48px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #0d2a6e, #0a4a3a);
+    border: 1px solid rgba(58,142,246,0.28);
+    box-shadow: 0 0 20px rgba(58,142,246,0.22);
+    overflow: hidden;
+    display: grid; place-items: center;
+    flex-shrink: 0;
+  }
+  .logo-mark img { width: 100%; height: 100%; object-fit: cover; }
+  .logo-fallback {
+    font-family: 'Space Mono', monospace;
+    font-size: 14px; font-weight: 700; color: #fff;
+  }
+  .header-text .brand-name {
+    font-size: 18px; font-weight: 700;
+    background: linear-gradient(90deg, #c8deff, #1dffd4 80%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .header-text .brand-sub {
+    font-size: 11px; color: var(--muted); font-weight: 300;
+    font-family: 'Space Mono', monospace; letter-spacing: 0.5px; margin-top: 2px;
+  }
+  .header-right {
+    margin-right: auto;
+    text-align: left;
+  }
+  .page-title {
+    font-size: 22px; font-weight: 700; color: var(--text);
+    letter-spacing: -0.3px;
+  }
+  .page-sub {
+    font-size: 12.5px; color: var(--muted); margin-top: 3px;
+  }
+
+  /* ── SECTION LABEL ── */
+  .section-label {
+    font-size: 10.5px; font-weight: 600; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--accent);
+    font-family: 'Space Mono', monospace;
+    margin-bottom: 16px; opacity: 0.8;
+  }
+
+  /* ── SERVICES GRID ── */
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 14px;
+    margin-bottom: 40px;
+  }
+
+  .service-card {
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 18px;
+    cursor: pointer;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .service-card::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; left: 0; height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    opacity: 0; transition: opacity 0.2s;
+  }
+  .service-card:hover {
+    border-color: var(--border-accent);
+    box-shadow: 0 0 0 1px rgba(58,142,246,0.2), 0 8px 32px rgba(10,20,60,0.5);
+    transform: translateY(-3px);
+  }
+  .service-card:hover::after { opacity: 1; }
+
+  .card-badge {
+    position: absolute; top: 12px; left: 12px;
+    font-size: 9.5px; font-weight: 700; padding: 3px 8px;
+    border-radius: 20px; letter-spacing: 0.05em;
+    font-family: 'Space Mono', monospace;
+  }
+  .badge-popular {
+    background: rgba(255,179,71,0.12); color: var(--warn);
+    border: 1px solid rgba(255,179,71,0.3);
+  }
+  .badge-free {
+    background: rgba(29,255,212,0.1); color: var(--accent2);
+    border: 1px solid rgba(29,255,212,0.25);
+  }
+
+  .card-icon {
+    width: 38px; height: 38px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; margin-bottom: 12px;
+    background: rgba(58,142,246,0.10);
+    border: 1px solid rgba(58,142,246,0.18);
+  }
+  .card-icon.teal { background: rgba(29,255,212,0.08); border-color: rgba(29,255,212,0.2); }
+  .card-icon.warn { background: rgba(255,179,71,0.08); border-color: rgba(255,179,71,0.2); }
+
+  .card-title {
+    font-size: 15px; font-weight: 700; color: var(--text);
+    margin-bottom: 5px;
+  }
+  .card-desc {
+    font-size: 12px; color: var(--muted); line-height: 1.55;
+    margin-bottom: 14px;
+  }
+
+  .card-pkg-pills {
+    display: flex; gap: 5px; margin-bottom: 14px;
+  }
+  .pkg-pill {
+    flex: 1; text-align: center; padding: 5px 4px;
+    border-radius: 7px; font-size: 10.5px; font-weight: 600;
+    background: rgba(58,142,246,0.06);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+  }
+  .pkg-pill.rec {
+    background: rgba(58,142,246,0.14);
+    border-color: rgba(58,142,246,0.35);
+    color: var(--accent);
+  }
+
+  .card-price-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 14px;
+  }
+  .card-price-build {
+    font-size: 19px; font-weight: 700; color: var(--text);
+    font-family: 'Space Mono', monospace;
+  }
+  .card-price-build span { font-size: 12px; color: var(--muted); font-weight: 400; font-family: 'Sora', sans-serif; }
+  .card-price-monthly { font-size: 11.5px; color: var(--muted); }
+  .card-price-monthly strong { color: var(--accent2); }
+
+  .btn-select {
+    width: 100%; padding: 10px;
+    border-radius: 999px; border: none;
+    background: linear-gradient(135deg, #2f5bea, #1a3aab);
+    box-shadow: 0 4px 14px rgba(47,91,234,0.28);
+    color: #fff; font-size: 13px; font-weight: 700;
+    cursor: pointer; font-family: 'Sora', sans-serif;
+    transition: filter 0.15s, transform 0.1s;
+  }
+  .btn-select:hover { filter: brightness(1.12); transform: translateY(-1px); }
+  .btn-select.free-btn {
+    background: linear-gradient(135deg, #1a9e6a, #0d7a50);
+    box-shadow: 0 4px 14px rgba(29,255,212,0.15);
+  }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(4,8,22,0.80);
+    z-index: 1000; align-items: center; justify-content: center;
+    padding: 20px; backdrop-filter: blur(6px);
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: #07101f;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    width: 100%; max-width: 500px;
+    max-height: 90vh; overflow-y: auto;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(58,142,246,0.1);
+    animation: slideUp 0.22s ease;
+    position: relative;
+  }
+  .modal::before {
+    content: '';
+    position: absolute; top: 0; right: 0; left: 0; height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .modal-head {
+    padding: 22px 22px 0;
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 20px;
+  }
+  .modal-icon-title { display: flex; align-items: center; gap: 12px; }
+  .modal-icon {
+    width: 40px; height: 40px; border-radius: 11px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    background: rgba(58,142,246,0.10);
+    border: 1px solid rgba(58,142,246,0.2);
+    flex-shrink: 0;
+  }
+  .modal-title { font-size: 18px; font-weight: 700; }
+  .modal-subtitle { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .btn-close {
+    background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+    border-radius: 8px; width: 30px; height: 30px;
+    cursor: pointer; color: var(--muted); font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s; flex-shrink: 0;
+  }
+  .btn-close:hover { background: rgba(58,142,246,0.12); color: var(--accent); }
+
+  .modal-body { padding: 0 22px 22px; }
+  .modal-divider { height: 1px; background: var(--border); margin: 18px 0; }
+
+  /* step label */
+  .step-lbl {
+    font-size: 10px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--accent);
+    font-family: 'Space Mono', monospace;
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 12px; opacity: 0.8;
+  }
+  .step-num {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: rgba(58,142,246,0.14); border: 1px solid rgba(58,142,246,0.35);
+    color: var(--accent); font-size: 9px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* package cards in modal */
+  .pkg-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+  .pkg-card {
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 13px 10px 11px; cursor: pointer; text-align: center;
+    background: rgba(12,26,56,0.4); position: relative;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .pkg-card:hover { border-color: var(--border-accent); }
+  .pkg-card.selected {
+    border-color: var(--accent);
+    background: rgba(58,142,246,0.10);
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+  .rec-tag {
+    position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
+    background: linear-gradient(90deg, var(--accent), #1dffd4);
+    color: #06101f; font-size: 8.5px; font-weight: 700;
+    padding: 2px 8px; border-radius: 10px; white-space: nowrap;
+    font-family: 'Space Mono', monospace;
+  }
+  .pkg-name {
+    font-size: 12.5px; font-weight: 700; color: var(--text);
+    margin-bottom: 4px; margin-top: 2px;
+    font-family: 'Space Mono', monospace;
+  }
+  .pkg-build {
+    font-size: 17px; font-weight: 700; color: var(--accent);
+    font-family: 'Space Mono', monospace;
+  }
+  .pkg-monthly { font-size: 10.5px; color: var(--muted); margin-top: 2px; }
+  .pkg-desc { font-size: 10.5px; color: var(--muted2); margin-top: 5px; line-height: 1.4; }
+
+  /* addons */
+  .addon-list { display: flex; flex-direction: column; gap: 7px; }
+  .addon-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px;
+    background: rgba(12,26,56,0.4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer; transition: border-color 0.15s;
+  }
+  .addon-row:hover { border-color: var(--border-accent); }
+  .addon-row.on {
+    border-color: rgba(58,142,246,0.4);
+    background: rgba(58,142,246,0.08);
+  }
+  .addon-chk {
+    width: 17px; height: 17px; border-radius: 4px;
+    border: 1.5px solid var(--muted2); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; color: #fff; transition: all 0.15s;
+  }
+  .addon-row.on .addon-chk {
+    background: var(--accent); border-color: var(--accent);
+  }
+  .addon-info { flex: 1; }
+  .addon-name { font-size: 12.5px; font-weight: 600; color: var(--text); }
+  .addon-desc { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .addon-cost {
+    font-size: 11px; font-weight: 700; color: var(--accent2);
+    font-family: 'Space Mono', monospace; flex-shrink: 0; text-align: left;
+    line-height: 1.5;
+  }
+
+  /* summary */
+  .summary-box {
+    background: rgba(12,26,56,0.55);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 15px;
+  }
+  .sum-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 5px 0; font-size: 12.5px;
+  }
+  .sum-row + .sum-row { border-top: 1px solid var(--border-soft); }
+  .sum-row .lbl { color: var(--muted); }
+  .sum-row .val { font-weight: 600; color: var(--text); font-family: 'Space Mono', monospace; }
+  .sum-total {
+    border-top: 1px solid var(--border) !important;
+    margin-top: 6px; padding-top: 12px !important;
+  }
+  .sum-total .lbl { font-size: 13px; font-weight: 700; color: var(--text); }
+  .sum-total .val { font-size: 22px; font-weight: 700; color: var(--accent); }
+  .sum-note {
+    font-size: 10.5px; color: var(--muted2); margin-top: 9px; text-align: center;
+    font-family: 'Space Mono', monospace;
+  }
+  .sum-note::before { content: '* '; }
+
+  /* buy button */
+  .btn-buy {
+    width: 100%; padding: 14px;
+    border-radius: 999px; border: none;
+    background: linear-gradient(135deg, #2f5bea, #1a3aab);
+    box-shadow: 0 6px 22px rgba(47,91,234,0.35);
+    color: #fff; font-size: 15px; font-weight: 700;
+    cursor: pointer; font-family: 'Sora', sans-serif;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin-top: 14px; transition: filter 0.15s, transform 0.1s;
+    letter-spacing: 0.02em;
+  }
+  .btn-buy:hover { filter: brightness(1.12); transform: translateY(-2px); }
+
+  /* toast */
+  .toast {
+    position: fixed; bottom: 28px; left: 50%;
+    transform: translateX(-50%) translateY(70px);
+    background: rgba(7,16,31,0.95);
+    border: 1px solid rgba(29,255,212,0.35);
+    border-radius: 12px; padding: 13px 22px;
+    display: flex; align-items: center; gap: 9px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    z-index: 9999; transition: transform 0.3s ease;
+    font-size: 13.5px; font-weight: 600; color: var(--accent2);
+    white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(80,140,255,0.2); border-radius: 4px; }
+
+  @media (max-width: 640px) {
+    .services-grid { grid-template-columns: 1fr; }
+    .pkg-grid { gap: 6px; }
+    .pkg-build { font-size: 15px; }
+    .modal { border-radius: 16px 16px 0 0; align-self: flex-end; max-height: 88vh; }
+    .modal-overlay { align-items: flex-end; padding: 0; }
+    header { flex-wrap: wrap; }
+    .header-right { margin-right: 0; width: 100%; margin-top: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo-mark">
+      <img src="https://raw.githubusercontent.com/richard36901-source/Home-page/main/logo.jpg" alt="AutoScale"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+      <span class="logo-fallback" style="display:none">AS</span>
+    </div>
+    <div class="header-text">
+      <div class="brand-name">AutoScale</div>
+      <div class="brand-sub">אוטומציות חכמות</div>
+    </div>
+    <div class="header-right">
+      <div class="page-title">⚡ רכישה מהירה</div>
+      <div class="page-sub">בחר שירות, התאם, ורכוש — הכול בכמה קליקים</div>
+    </div>
+  </header>
+
+  <!-- SERVICES -->
+  <div class="section-label">שירותים זמינים</div>
+  <div class="services-grid" id="servicesGrid"></div>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modal">
+    <div class="modal-head">
+      <div class="modal-icon-title">
+        <div class="modal-icon" id="mIcon"></div>
+        <div>
+          <div class="modal-title" id="mTitle"></div>
+          <div class="modal-subtitle" id="mSub"></div>
+        </div>
+      </div>
+      <button class="btn-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Step 1 -->
+      <div class="step-lbl"><span class="step-num">1</span>בחר חבילה</div>
+      <div class="pkg-grid" id="pkgGrid"></div>
+
+      <div class="modal-divider"></div>
+
+      <!-- Step 2 -->
+      <div class="step-lbl"><span class="step-num">2</span>תוספות אופציונליות</div>
+      <div class="addon-list" id="addonList"></div>
+
+      <div class="modal-divider"></div>
+
+      <!-- Step 3 -->
+      <div class="step-lbl"><span class="step-num">3</span>סיכום תמחור</div>
+      <div class="summary-box">
+        <div class="sum-row">
+          <span class="lbl">בנייה חד-פעמית</span>
+          <span class="val" id="sBuild">—</span>
+        </div>
+        <div class="sum-row">
+          <span class="lbl">תחזוקה חודשית</span>
+          <span class="val" id="sMonthly">—</span>
+        </div>
+        <div class="sum-row" id="sAddonsRow" style="display:none">
+          <span class="lbl">תוספות</span>
+          <span class="val" id="sAddons">—</span>
+        </div>
+        <div class="sum-row sum-total">
+          <span class="lbl">סה״כ לתשלום עכשיו</span>
+          <span class="val" id="sTotal">—</span>
+        </div>
+        <div class="sum-note">בנייה + חודש ראשון + תוספות נגבים מיידית. יש להוסיף מע״מ.</div>
+      </div>
+
+      <!-- Step 4 -->
+      <button class="btn-buy" onclick="handleBuy()">
+        🛒&nbsp; לרכישה מהירה
+      </button>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">✅&nbsp; הזמנתך התקבלה — ניצור קשר בקרוב</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────
+const ADDONS = [
+  { id:'dashboard',  name:'דשבורד ניהול',      desc:'צפה בכל שיחות ותוצאות לפי לקוח',           buildExtra:500,  monthlyExtra:150 },
+  { id:'notif',      name:'התראות בזמן אמת',   desc:'הודעה לנייד כשמישהו עונה עם מספרו',         buildExtra:0,    monthlyExtra:80  },
+  { id:'reports',    name:'דוחות תקופתיים',    desc:'PDF שבועי עם נתוני ביצועים ומעקב',           buildExtra:0,    monthlyExtra:120 },
+  { id:'priority',   name:'תמיכה Priority',    desc:'מענה תוך שעה בשעות עסקים',                  buildExtra:0,    monthlyExtra:200 },
+];
+
+const SERVICES = [
+  {
+    id:'wa-outreach', icon:'📤', iconClass:'teal',
+    badge:{ text:'פופולרי', cls:'badge-popular' },
+    title:'WhatsApp Outreach',
+    desc:'שליחת מסרים אוטומטיים לרשימת לידים עם מעקב ואופטימיזציה',
+    packages:[
+      { name:'בסיסי',    build:1500, monthly:400,  desc:'500 איש / 3 שלבים' },
+      { name:'מקצועי',   build:2800, monthly:700,  desc:'2,000 איש / 6 שלבים', rec:true },
+      { name:'מתקדם',    build:5000, monthly:1200, desc:'ללא הגבלה / 12 שלבים' },
+    ]
+  },
+  {
+    id:'wa-bot', icon:'🤖', iconClass:'',
+    badge:null,
+    title:'WhatsApp Bot',
+    desc:'בוט חכם שמנהל שיחה עם לידים 24/7 ומביא אותם לסגירה',
+    packages:[
+      { name:'בסיסי',    build:2000, monthly:500,  desc:'5 שלבי שיחה' },
+      { name:'מקצועי',   build:3500, monthly:900,  desc:'12 שלבים + זיהוי כוונות', rec:true },
+      { name:'מתקדם',    build:6500, monthly:1500, desc:'AI מלא + אינטגרציות' },
+    ]
+  },
+  {
+    id:'email', icon:'📧', iconClass:'',
+    badge:null,
+    title:'Email Outreach',
+    desc:'רצפי מיילים אוטומטיים עם פרסונליזציה, מעקב פתיחות וקליקים',
+    packages:[
+      { name:'בסיסי',    build:1200, monthly:350,  desc:'1,000 איש / 4 מיילים' },
+      { name:'מקצועי',   build:2200, monthly:600,  desc:'5,000 איש / 8 מיילים', rec:true },
+      { name:'מתקדם',    build:4000, monthly:1000, desc:'ללא הגבלה / A/B Testing' },
+    ]
+  },
+  {
+    id:'landing', icon:'🏠', iconClass:'warn',
+    badge:null,
+    title:'דף נחיתה + CRM',
+    desc:'עמוד ממיר עם מערכת CRM לניהול לידים ומעקב אחר תהליך המכירה',
+    packages:[
+      { name:'בסיסי',    build:2500, monthly:500,  desc:'עמוד אחד + CRM בסיסי' },
+      { name:'מקצועי',   build:4500, monthly:900,  desc:'3 עמודים + CRM מלא', rec:true },
+      { name:'מתקדם',    build:8000, monthly:1400, desc:'Funnel מלא + אוטומציה' },
+    ]
+  },
+  {
+    id:'scheduling', icon:'📅', iconClass:'teal',
+    badge:{ text:'חינם', cls:'badge-free' },
+    title:'הגדרת לוח זמנים',
+    desc:'חיבור Google Calendar / Calendly עם תזכורות אוטומטיות ללקוחות',
+    free:true,
+    packages:[
+      { name:'בסיסי',    build:0, monthly:0, desc:'Google Calendar' },
+      { name:'מקצועי',   build:0, monthly:0, desc:'Calendly + SMS', rec:true },
+      { name:'מתקדם',    build:0, monthly:0, desc:'מולטי-קלנדר + CRM' },
+    ]
+  },
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────
+let cur = null, selPkg = 1, selAddons = new Set();
+
+// ── GRID ──────────────────────────────────────────────────────────────
+function renderGrid() {
+  document.getElementById('servicesGrid').innerHTML = SERVICES.map(s => {
+    const pro = s.packages[1];
+    return `
+    <div class="service-card" onclick="openModal('${s.id}')">
+      ${s.badge ? `<span class="card-badge ${s.badge.cls}">${s.badge.text}</span>` : ''}
+      <div class="card-icon ${s.iconClass}">${s.icon}</div>
+      <div class="card-title">${s.title}</div>
+      <div class="card-desc">${s.desc}</div>
+      <div class="card-pkg-pills">
+        ${s.packages.map(p=>`<div class="pkg-pill${p.rec?' rec':''}">${p.name}</div>`).join('')}
+      </div>
+      <div class="card-price-row">
+        <div class="card-price-build">
+          ${pro.build===0 ? '<span style="color:var(--accent2)">חינם</span>' : '₪'+pro.build.toLocaleString()}
+          ${pro.build>0 ? '<span> בנייה</span>' : ''}
+        </div>
+        <div class="card-price-monthly">
+          ${pro.monthly>0 ? `<strong>₪${pro.monthly.toLocaleString()}</strong>/חודש` : `<strong style="color:var(--accent2)">ללא חודשי</strong>`}
+        </div>
+      </div>
+      <button class="btn-select${s.free?' free-btn':''}" onclick="event.stopPropagation();openModal('${s.id}')">
+        ${s.free ? 'הגדרה חינמית ←' : 'בחר חבילה ←'}
+      </button>
+    </div>`;
+  }).join('');
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────
+function openModal(id) {
+  cur = SERVICES.find(s=>s.id===id);
+  selPkg = 1; selAddons = new Set();
+  document.getElementById('mIcon').textContent = cur.icon;
+  document.getElementById('mTitle').textContent = cur.title;
+  document.getElementById('mSub').textContent = cur.desc;
+  renderPkgs(); renderAddons(); updateSummary();
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('modalOverlay').addEventListener('click', e => { if(e.target===e.currentTarget) closeModal(); });
+
+function renderPkgs() {
+  document.getElementById('pkgGrid').innerHTML = cur.packages.map((p,i)=>`
+    <div class="pkg-card${i===selPkg?' selected':''}" onclick="selPackage(${i})">
+      ${p.rec ? '<span class="rec-tag">מומלץ</span>' : ''}
+      <div class="pkg-name">${p.name}</div>
+      <div class="pkg-build">${p.build===0?'חינם':'₪'+p.build.toLocaleString()}</div>
+      <div class="pkg-monthly">${p.monthly>0?'₪'+p.monthly.toLocaleString()+'/חודש':'ללא תחזוקה'}</div>
+      <div class="pkg-desc">${p.desc}</div>
+    </div>`).join('');
+}
+function selPackage(i) { selPkg=i; renderPkgs(); updateSummary(); }
+
+function renderAddons() {
+  document.getElementById('addonList').innerHTML = ADDONS.map(a=>`
+    <div class="addon-row${selAddons.has(a.id)?' on':''}" onclick="toggleAddon('${a.id}')">
+      <div class="addon-chk">${selAddons.has(a.id)?'✓':''}</div>
+      <div class="addon-info">
+        <div class="addon-name">${a.name}</div>
+        <div class="addon-desc">${a.desc}</div>
+      </div>
+      <div class="addon-cost">
+        ${a.buildExtra>0?'+₪'+a.buildExtra.toLocaleString()+' בנייה<br>':''}
+        ${a.monthlyExtra>0?'+₪'+a.monthlyExtra.toLocaleString()+'/חודש':''}
+        ${a.buildExtra===0&&a.monthlyExtra===0?'כלול':''}
+      </div>
+    </div>`).join('');
+}
+function toggleAddon(id) {
+  selAddons.has(id)?selAddons.delete(id):selAddons.add(id);
+  renderAddons(); updateSummary();
+}
+
+function updateSummary() {
+  const p = cur.packages[selPkg];
+  let eB=0, eM=0;
+  selAddons.forEach(id=>{ const a=ADDONS.find(x=>x.id===id); eB+=a.buildExtra; eM+=a.monthlyExtra; });
+  const totB=p.build+eB, totM=p.monthly+eM, totNow=totB+totM;
+  const f=n=>n===0?'חינם':'₪'+n.toLocaleString();
+  document.getElementById('sBuild').textContent   = f(p.build);
+  document.getElementById('sMonthly').textContent = p.monthly>0 ? f(p.monthly)+'/חודש' : 'ללא';
+  document.getElementById('sTotal').textContent   = f(totNow);
+  const hasE = eB>0||eM>0;
+  document.getElementById('sAddonsRow').style.display = hasE?'flex':'none';
+  if(hasE) document.getElementById('sAddons').textContent = '+₪'+(eB+eM).toLocaleString();
+}
+
+// ── BUY ───────────────────────────────────────────────────────────────
+function handleBuy() {
+  const p = cur.packages[selPkg];
+  let eB=0,eM=0;
+  selAddons.forEach(id=>{ const a=ADDONS.find(x=>x.id===id); eB+=a.buildExtra; eM+=a.monthlyExtra; });
+  const payload = {
+    service: cur.id, serviceTitle: cur.title,
+    package: p.name,
+    buildPrice: p.build+eB, monthlyPrice: p.monthly+eM,
+    totalNow: p.build+eB+p.monthly+eM,
+    addons: [...selAddons],
+    timestamp: new Date().toISOString()
+  };
+  console.log('AutoScale webhook →', payload);
+  // Uncomment to fire webhook:
+  // fetch('https://YOUR_WEBHOOK_URL', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) }).catch(()=>{});
+  // Uncomment to open payment page:
+  // window.open('https://pay.grow.link/YOUR_LINK?amount='+payload.totalNow, '_blank');
+  closeModal();
+  const t=document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),4200);
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────
+renderGrid();
+</script>
+</body>
+</html>
